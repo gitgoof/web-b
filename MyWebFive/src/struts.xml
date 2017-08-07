@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+        "http://struts.apache.org/dtds/struts-2.5.dtd">
+
+<struts>
+
+    <constant name="struts.devMode" value="true"/>
+    <constant name="struts.objectFactory" value="spring"/>
+
+    <package name="helloworld" extends="struts-default">
+
+        <interceptors><!-- 自定义拦截器 -->
+            <interceptor name="myinterceptor" class="com.web.five.interceptor.MyInterceptor"/>
+        </interceptors>
+
+        <action name="index">
+            <result>/index.jsp</result>
+        </action>
+
+        <action name="hello"
+        class="com.web.five.action.HelloWorldAction"
+        method="execute">
+            <result name="error">/error.jsp</result>
+
+            <result name="success" type="dispatcher">
+                <param name="location">/index.jsp</param>
+            </result>
+        </action>
+
+        <action name="login"
+        class="com.web.five.action.ActionTwo"
+        method="execute">
+            <interceptor-ref name="myinterceptor"/><!-- 使用自定义的拦截器 -->
+            <interceptor-ref name="basicStack"/>
+            <interceptor-ref name="timer"/>
+
+            <result name="success">/index.jsp</result>
+            <result name="error">/error.jsp</result>
+            <param name="staticname">Static Name</param>
+
+        </action>
+<!--
+        <action name="user" class="com.web.five.action.MyJsonActionOne"
+                method="execute">
+            <result type="json"></result>
+        </action>
+-->
+
+    </package>
+    <!-- struts2的action必须放在一个指定的包空间下定义 -->
+    <package name="myjson" extends="struts-default">
+
+        <result-types>
+            <result-type name="json" class="org.apache.struts2.json.JSONResult"></result-type>
+        </result-types>
+
+
+        <!-- 定义处理请求URL为user.action的Action -->
+        <action name="user" class="myjsonaction"
+        method="execute">
+            <!-- <interceptor-ref name="json"/>// 拦截器，用于把传过来的json数据转换成action中的参数 -->
+            <result name="success" type="json">
+                <param name="root">successBean</param>
+                <param name="excludeNullProperties">true</param>
+            </result>
+            <result name="error" type="json">
+                <param name="excludeNullProperties">true</param><!-- 剔除掉为空的属性 -->
+                <param name="root">errorBean</param>
+            </result>
+        </action>
+    </package>
+
+</struts>
